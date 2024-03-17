@@ -9,7 +9,7 @@ class Window(QtWidgets.QMainWindow):
         self.ui = Ui_Form()
         self.ui.setupUi(self)
 
-        self.is_answer = False
+        self.is_ok = True
 
         self.numbers = [
             self.ui.pushButton_0,
@@ -62,7 +62,7 @@ class Window(QtWidgets.QMainWindow):
 
     # Кнопка, отвечающая за +/-
     def connect_neg(self):
-        self.check_answer()
+        self.check_ok()
         text = self.ui.lineEdit.displayText()
         if text and text[-1] in "0123456789":
             i = len(text) - 1
@@ -74,7 +74,7 @@ class Window(QtWidgets.QMainWindow):
 
     # Кнопка, отвечающая за .
     def connect_dot(self):
-        self.check_answer()
+        self.check_ok()
         text = self.ui.lineEdit.displayText()
         if text and text[-1] in "0123456789":
             i = len(text) - 1
@@ -97,7 +97,7 @@ class Window(QtWidgets.QMainWindow):
 
     # Кнопки, отвечающие за (x^2, x^(1/2), 1/x)
     def add_op_with_num(self, op):
-        self.check_answer()
+        self.check_ok()
         text = self.ui.lineEdit.displayText()
         if op == "1/":
             for s in "+-/*^%":
@@ -121,8 +121,10 @@ class Window(QtWidgets.QMainWindow):
             try:
                 self.ui.lineEdit.setText(self.calculate(text))
             except ZeroDivisionError:
+                self.is_ok = False
                 self.ui.lineEdit.setText("You can't divide by 0!")
             except:
+                self.is_ok = False
                 self.ui.lineEdit.setText("Incorrect expression!")
 
     # Кнопка C
@@ -131,13 +133,13 @@ class Window(QtWidgets.QMainWindow):
 
     # Кнопка del
     def connect_del(self):
-        self.check_answer()
+        self.check_ok()
         text = self.ui.lineEdit.displayText()
         self.ui.lineEdit.setText(text[:-1])
 
     # Кнопки, отвечающие за (+, -, *, /, ^, %)
     def add_op(self, op):
-        self.check_answer()
+        self.check_ok()
         text = self.ui.lineEdit.displayText()
         for o in "+-*/%^":
             if o in text and text[-1] not in "+-*/%^.":
@@ -155,7 +157,7 @@ class Window(QtWidgets.QMainWindow):
 
     # Кнопки, отвечающие за цифры
     def add_number(self, number):
-        self.check_answer()
+        self.check_ok()
         text = self.ui.lineEdit.displayText()
         if len(text) == 0 or text[-1] != ")":
             if (len(text) == 1 and text[-1] == "0") or (
@@ -165,11 +167,11 @@ class Window(QtWidgets.QMainWindow):
             else:
                 self.ui.lineEdit.setText(text + number)
 
-    # Проверка на то, что ответ получен
-    def check_answer(self):
-        if self.is_answer:
+    # Проверка на то, что выражение было неверным
+    def check_ok(self):
+        if not self.is_ok:
             self.ui.lineEdit.clear()
-            self.is_answer = False
+            self.is_ok = True
 
     def calculate(self, text):
         return str(eval(text.replace("^", "**")))
